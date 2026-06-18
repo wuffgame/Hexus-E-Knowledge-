@@ -3,10 +3,17 @@ import re
 token_pattern = [
         ("INT", r"\d+"),
         ("PLUS", r"\+"),
-        ("MINUS", r"\-"),
+        ("MINUS", r"-"),
+        ("EQUALS", r'=='),
         ("MUL", r"\*"),
-        ("DIV", r"\/"),
-        ("SPACE", r"\s+"),
+        ("DIV", r"/"),
+        ("STRING", r'"[^"\\]*(?:\\.[^"\\]*)*"'),
+        ("KEYWORD", r'\b(send|to|console|read|from|if|is|or|else)\b'),
+        ("ID", r'[a-zA-Z_][a-zA-Z0-9_]*'),
+        ("LBRACE", r'\{'),
+        ("RBRACE", r'\}'),
+        ("SKIP", r'[ \t]+'),
+        ("NEWLINE", r'\n')
     ]
 
 def tokenizer(text, definition):
@@ -26,5 +33,5 @@ def tokenizer(text, definition):
 
     return tokens
 
-tekst = "12+5-432*13/5"
+tekst = 'Nothing c:'
 print(tokenizer(tekst, token_pattern))
