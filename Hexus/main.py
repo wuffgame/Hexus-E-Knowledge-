@@ -1,5 +1,5 @@
 import sys
-from lexer import ftokenizer
+from lexer import tokenizer_tokens
 
 def main():
     file_name = "test.he"
@@ -10,7 +10,7 @@ def main():
     except FileNotFoundError:
         print(f"File {file_name} not found!!!")
         return
-    token_list = ftokenizer(source_code)
+    token_list = tokenizer_tokens(source_code)
     for token in token_list:
         print(token)
 

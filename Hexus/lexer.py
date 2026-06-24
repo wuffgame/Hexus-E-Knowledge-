@@ -33,6 +33,6 @@ def tokenizer(text, definition):
 
     return tokens
 
-def ftokenizer(text):
+def tokenizer_tokens(text):
     tokens = tokenizer(text, token_pattern)
     return tokens
