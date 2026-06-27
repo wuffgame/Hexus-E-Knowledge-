@@ -1,0 +1,8 @@
+read "Write any symbol: " to var from console
+send "{var}" to console
+if var is 10 or var == 10 {
+    send "{var} == 10" to console
+}
+else {
+    send "{var} != 10" to console
+}
