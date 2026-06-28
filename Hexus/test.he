@@ -1,2 +1,4 @@
 send "Hello World" to console
 read "Wpisz hasło: " to var from console
+test = 3
+test2 is "nie wiem"

@@ -13,8 +13,8 @@ def main():
         print(f"File {file_name} not found!!!")
         return
     token_list = tokenizer_tokens(source_code)
-    for token in token_list:
-        print(token)
+    #for token in token_list:
+        #print(token)
 
     clear_tokens = [t for t in token_list if t[0] != "SKIP"]
     try:

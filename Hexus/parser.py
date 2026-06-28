@@ -24,6 +24,14 @@ class ReadCommandNode:
     def __repr__(self):
         return f"ReadCommandNode(text={self.text_value}, var={self.var_name})"
 
+class SetVar:
+    def __init__(self, var_name, value):
+        self.var_name = var_name
+        self.value = value
+
+    def __repr__(self):
+        return f"SetVarNode(var= {self.var_name}, value={self.value})"
+
 class BinaryOpNode:
     def __init__(self, left, op, right):
         self.left = left
@@ -37,9 +45,9 @@ class HexusParser:
         self.tokens = tokens
         self.pos = 0
 
-    def peek(self):
-        if self.pos <len(self.tokens):
-            return self.tokens[self.pos]
+    def peek(self, offset=0):
+        if self.pos + offset <len(self.tokens):
+            return self.tokens[self.pos + offset]
         return ("EOF", "EOF")
 
     def consume(self, expected_type):
@@ -96,12 +104,47 @@ class HexusParser:
         elif token_type == "MINUS":
             self.consume("MINUS")
             op = "-"
+        elif token_type == "MUL":
+            self.consume("MUL")
+            op = "*"
+        elif token_type == "DIV":
+            self.consume("DIV")
+            op = "/"
         else:
             raise SyntaxError(f"Expected a mathematical operator, but found {token_type}")
 
         right = self.parse_value()
         self.consume_end_of_statement()
         return BinaryOpNode(left, op, right)
+
+    def parse_var(self):
+        var = self.consume("VAR")
+        token_type, value = self.peek()
+        if token_type == "EQUAL":
+            self.consume("EQUAL")
+            token_type, value = self.peek()
+            if token_type == "INT":
+                value = self.consume("INT")
+            elif token_type == "STRING":
+                value = self.consume("STRING")
+            else:
+                raise SyntaxError(f"SyntaxError: Expected string or number, but found {token_type}")
+
+        elif token_type == "KEYWORD" and value == "is":
+            self.consume("KEYWORD")
+            token_type, value = self.peek()
+            if token_type == "INT":
+                value = self.consume("INT")
+            elif token_type == "STRING":
+                value = self.consume("STRING")
+            else:
+                raise SyntaxError(f"SyntaxError: Expected string or number, but found {token_type}")
+        else:
+            raise SyntaxError(f"SyntaxError: Expected '=' or 'is', but found {token_type} ('{value}')")
+
+        self.consume_end_of_statement()
+        return SetVar(var, value)
+
 
 
     def parse_send(self):
@@ -139,7 +182,11 @@ class HexusParser:
                 node = self.parse_read()
                 program_nodes.append(node)
             elif token_type == "INT" or token_type == "VAR":
-                node = self.parse_expression()
+                next_type, next_value = self.peek(1)
+                if token_type == "VAR" and (next_type == "EQUAL" or (next_type == "KEYWORD" and next_value == "is")):
+                    node = self.parse_var()
+                else:
+                    node = self.parse_expression()
                 program_nodes.append(node)
             else:
                 raise SyntaxError(f"Unknown start instruction: {token_type} ('{value}')")
