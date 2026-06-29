@@ -24,6 +24,10 @@ class ReadCommandNode:
     def __repr__(self):
         return f"ReadCommandNode(text={self.text_value}, var={self.var_name})"
 
+class StopNode:
+    def __repr__(self):
+        return f"StopNode()"
+
 class SetVar:
     def __init__(self, var_name, value):
         self.var_name = var_name
@@ -165,6 +169,11 @@ class HexusParser:
         self.consume_end_of_statement()
         return ReadCommandNode(text, var)
 
+    def parse_stop(self):
+        self.consume("KEYWORD")
+        self.consume_end_of_statement()
+        return StopNode()
+
     def parse(self):
         program_nodes = []
 
@@ -180,6 +189,9 @@ class HexusParser:
                 program_nodes.append(node)
             elif token_type == "KEYWORD" and value == "read":
                 node = self.parse_read()
+                program_nodes.append(node)
+            elif token_type == "KEYWORD" and value == "stop":
+                node = self.parse_stop()
                 program_nodes.append(node)
             elif token_type == "INT" or token_type == "VAR":
                 next_type, next_value = self.peek(1)
